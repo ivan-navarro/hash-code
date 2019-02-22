@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/Pizza/.vs/Pizza/DesignTimeBuild
+/Pizza/.vs/Pizza/v15
+/Pizza/Source/obj
+/Pizza/Tests/bin/Debug/netcoreapp2.1
+/Pizza/Tests/obj

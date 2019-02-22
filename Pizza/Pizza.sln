@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2048
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pizza", "Source\Pizza.csproj", "{7DD3EA53-2F0B-415D-A196-E2BE5CDF554A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pizza.Tests", "Tests\Pizza.Tests.csproj", "{EFEA3901-9928-486F-8C7D-802916982CD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DD3EA53-2F0B-415D-A196-E2BE5CDF554A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DD3EA53-2F0B-415D-A196-E2BE5CDF554A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DD3EA53-2F0B-415D-A196-E2BE5CDF554A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DD3EA53-2F0B-415D-A196-E2BE5CDF554A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFEA3901-9928-486F-8C7D-802916982CD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFEA3901-9928-486F-8C7D-802916982CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFEA3901-9928-486F-8C7D-802916982CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFEA3901-9928-486F-8C7D-802916982CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC68ABA3-2FC2-4D5F-8024-A774ECFACDDE}
+	EndGlobalSection
+EndGlobal
