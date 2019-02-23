@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Drawing;
 using System.IO;
@@ -27,8 +28,9 @@ namespace HashCode_Pizza
 
             Bitmap bitmap = pizzaPlate.generateSlicingBitmap(slices);
 
-            var outputFile = Path.Combine(OutputFolder, Path.GetFileName(inputFile) + ".out");
-            bitmap.Save(outputFile + ".png", System.Drawing.Imaging.ImageFormat.Png);
+            var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
+            var outputImage = outputFile + ".png";
+            bitmap.Save(outputImage, System.Drawing.Imaging.ImageFormat.Png);
 
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
             {
@@ -46,6 +48,8 @@ namespace HashCode_Pizza
                     sw.WriteLine();
                 }
             }
+
+            Process.Start(outputImage);
         }
 
         private static PizzaPlate loadData(string fileName)
