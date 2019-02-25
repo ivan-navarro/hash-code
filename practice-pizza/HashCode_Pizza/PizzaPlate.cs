@@ -130,7 +130,7 @@ namespace HashCode_Pizza
                     PizzaSlice newSlice = new PizzaSlice(nextSliceId, r, w, c, h);
 
                     var size = newSlice.GetSize();
-                    if (size >= bestSize)
+                    if (size > bestSize)
                     {
                         bestSize = size;
                         bestSlice = newSlice;
@@ -141,80 +141,17 @@ namespace HashCode_Pizza
             var found = bestSlice != null;
             if (found)
             {
-                bestSlice.RemoveSliceFromPlate(plate);
-                sliceHash.Add(bestSlice.ID, bestSlice);
-            }
-
-            return found;
-        }
-
-        private PizzaSlice GetMaxSliceExtentionAt(int[,] plate, Dictionary<int, PizzaSlice> sliceHash, int row, int column, int nextSliceId)
-        {
-            PizzaSlice maxSlice = null;
-            int maxSliceIngredients = 0;
-
-            for (int minRow = row; minRow >= Math.Max(0, row - this.mMaxSliceSize); minRow--)
-            for (int maxRow = row; maxRow < Math.Min(row + this.mMaxSliceSize + 1, mRows); maxRow++)
-            {
-                for (int minCol = column; minCol >= Math.Max(0, column - this.mMaxSliceSize); minCol--)
-                for (int maxCol = column; maxCol < Math.Min(column + this.mMaxSliceSize + 1, mColumns); maxCol++)
+                if (IsValidSlicing(sliceHash.Values.ToList()))
                 {
-                    int isValidSlice = IsValidSlice(this.mPlate, minRow, maxRow, minCol, maxCol);
-                    if ((isValidSlice == CHECK_SLICE_TOO_BIG) || (isValidSlice == CHECK_SLICE_INVALID_SLICE))
-                        break;
-
-                    if (isValidSlice != CHECK_SLICE_VALID)
-                        continue;
-
-                    PizzaSlice newSlice = new PizzaSlice(nextSliceId, minRow, maxRow, minCol, maxCol);
-
-                    // The new slice contains positions previously not in any slice
-                    int newSliceIngredients = newSlice.CountIngredients(plate);
-                    if (newSliceIngredients == 0)
-                        continue;
-
-                    // Check overlapping slices are still valid slices
-                    Dictionary<int, int> sliceContent = newSlice.GetSliceContent(plate);
-                    bool isValidOverlap = true;
-                    foreach (int overlapSliceId in sliceContent.Keys)
-                    {
-                        if (overlapSliceId > 0)
-                            continue;
-
-                        PizzaSlice existingSlice = sliceHash[overlapSliceId];
-                        PizzaSlice existingAfterOverlap = existingSlice.BuildShirnkedSliceWithOverlapping(newSlice);
-                        if (existingAfterOverlap == null)
-                        {
-                            isValidOverlap = false;
-                            break;
-                        }
-
-                        if (this.IsValidSlice(this.mPlate, 
-                            existingAfterOverlap.RowMin, existingAfterOverlap.RowMax, 
-                            existingAfterOverlap.ColumnMin, existingAfterOverlap.ColumnMax) != CHECK_SLICE_VALID)
-                        {
-                            isValidOverlap = false;
-                            break;
-                        }
-                    }
-                    if (isValidOverlap == false)
-                        continue;
-
-                    // Check if the new slice is bettter than existing max
-                    if (maxSlice == null)
-                    {
-                        maxSlice = newSlice;
-                        maxSliceIngredients = newSliceIngredients;
-                    }
-                    else if (maxSliceIngredients < newSliceIngredients)
-                    {
-                        maxSlice = newSlice;
-                        maxSliceIngredients = newSliceIngredients;
-                    }
+                    bestSlice.RemoveSliceFromPlate(plate);
+                    sliceHash.Add(bestSlice.ID, bestSlice);
+                }
+                else
+                {
                 }
             }
 
-            return maxSlice;
+            return found;
         }
 
         public bool IsValidSlicing(List<PizzaSlice> slices)
