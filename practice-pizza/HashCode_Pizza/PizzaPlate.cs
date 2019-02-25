@@ -121,7 +121,7 @@ namespace HashCode_Pizza
             for (int w = r; w - r <= this.mMaxSliceSize && w < this.mRows; w++)
             {
                 // (w - r) * (h - c) < this.mMaxSliceSize  && 
-                for (int h = c; h < this.mColumns && (w - r) * (h - c) < this.mMaxSliceSize; h++)
+                for (int h = c; h < this.mColumns && (w - r + 1) * (h - c + 1) < this.mMaxSliceSize; h++)
                 {
                     int isValidSlice = IsValidSlice(this.mPlate, r, w, c, h);
                     if (isValidSlice != CHECK_SLICE_VALID)

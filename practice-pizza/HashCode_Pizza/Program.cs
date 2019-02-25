@@ -15,8 +15,8 @@ namespace HashCode_Pizza
         static void Main(string[] args)
         {
             //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.in";
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_small.in";
-            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_small - Copy.in";
+            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_small.in";
+            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_small - Copy.in";
 
             PizzaPlate pizzaPlate = loadData(inputFile);
 
