@@ -13,25 +13,20 @@ namespace HashCode_Pizza
         public List<Slide> Slides { get; }
 
         // todo: calculate value from slides
-        private int Value()
+        public int Value()
         {
             int i = 0;
-            Slide Current;
-            Slide Prev;
+            Slide Prev= null;
 
             foreach (Slide Current in Slides)
             {
                 if (Prev != null)
                 {
-                    i+= AssemblyAlgorithmIdAttribute.
-                }
-                else
-                {
-                    //first item! 
+                    i += InterestCalculator.CalculateFactorOfInterest(Current.Tags, Prev.Tags);
                     Prev = Current;
-                }
+                } 
+                Prev = Current;
             }
-
             return i;
 
         }

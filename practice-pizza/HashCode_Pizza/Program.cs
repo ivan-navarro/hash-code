@@ -39,13 +39,6 @@ namespace HashCode_Pizza
             var bestSlideShow = CreateSlideShow(photos);
             var slides = bestSlideShow.Slides.ToList();
 
-            foreach (var slide in slides)
-            {
-                slide = slides;
-
-            }
-         
-
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
 
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
@@ -58,6 +51,7 @@ namespace HashCode_Pizza
             }
 
             Console.WriteLine("file processed " + inputFile);
+            Console.WriteLine("score for "+inputFile+ " is "+ bestSlideShow.Value());
         }
 
         private static SlideShow CreateSlideShow(List<Photo> photos)
