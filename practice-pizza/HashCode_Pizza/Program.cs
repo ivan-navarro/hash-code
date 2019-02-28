@@ -17,18 +17,23 @@ namespace HashCode_Pizza
 
         static void Main(string[] args)
         {
-            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.txt";
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_lovely_landscapes.txt";
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\c_memorable_moments.txt";
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\d_pet_pictures.txt";
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\e_shiny_selfies.txt";
+            ProcessFile(@"..\..\..\Input\a_example.txt");
+            ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt");
+            ProcessFile(@"..\..\..\Input\c_memorable_moments.txt");
+            ProcessFile(@"..\..\..\Input\d_pet_pictures.txt");
+            ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt");
 
+            Console.ReadLine();
+        }
+
+        private static void ProcessFile(string inputFile)
+        {
             var catalog = loadData(inputFile);
 
-            foreach (var photo in catalog.Photos)
-            {
-                Console.WriteLine($"photo {photo}");
-            }
+            //foreach (var photo in catalog.Photos)
+            //{
+            //    Console.WriteLine($"photo {photo}");
+            //}
 
             var slides = CreateSlides(catalog);
 
@@ -37,15 +42,11 @@ namespace HashCode_Pizza
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
             {
                 sw.WriteLine(slides.Count);
-                Console.WriteLine(slides.Count);
                 foreach (var slide in slides)
                 {
-                    Console.WriteLine(string.Join(" ", slide.Photos.Select(p => p.Id)));
                     sw.WriteLine(string.Join(" ", slide.Photos.Select(p => p.Id)));
                 }
             }
-
-            Console.ReadLine();
         }
 
         private static List<Slide> CreateSlides(Catalog catalog)
@@ -68,6 +69,7 @@ namespace HashCode_Pizza
                     else
                     {
                         slides.Add(new VerticalSlide(photo, verticalPhoto));
+                        verticalPhoto = null;
                     }
                 }
             }
@@ -78,7 +80,7 @@ namespace HashCode_Pizza
         private static Catalog loadData(string fileName)
         { 
             var catalog = new Catalog();
-            int photoId = 1;
+            int photoId = 0;
 
             // Load data
             using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName))
