@@ -35,9 +35,16 @@ namespace HashCode_Pizza
             //{
             //    Console.WriteLine($"photo {photo}");
             //}
+        
+            var bestSlideShow = CreateSlideShow(photos);
+            var slides = bestSlideShow.Slides.ToList();
 
-            var slideshow = CreateSlideShow(photos);
-            var slides = slideshow.Slides;
+            foreach (var slide in slides)
+            {
+                slide = slides;
+
+            }
+         
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
 
