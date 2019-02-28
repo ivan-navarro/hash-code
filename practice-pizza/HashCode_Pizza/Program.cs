@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace HashCode_Pizza
 {
+     //let's code!
     class Program
     {
         const string OutputFolder = @"..\..\..\Output\";
