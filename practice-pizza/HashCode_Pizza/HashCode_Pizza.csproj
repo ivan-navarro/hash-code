@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InterestCalculator.cs" />
-    <Compile Include="Catalog.cs" />
+    <Compile Include="SlideShow.cs" />
     <Compile Include="Photo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -38,13 +38,17 @@ namespace HashCode_Pizza
         
             var bestSlideShow = CreateSlideShow(photos);
             var slides = bestSlideShow.Slides.ToList();
-
-            foreach (var slide in slides)
+            var newSlides = new List<Slide>();
+            Random r = new Random();
+            for (int i = 0; i < 100; i++)
             {
-                
+                var pos = r.Next(slides.Count - 1);
+                var temp = newSlides.ElementAt(pos);
+                newSlides.RemoveAt(pos);
+                newSlides.Insert(0, temp);
 
+               // SlideShow.
             }
-         
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
 
