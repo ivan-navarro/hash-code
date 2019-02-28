@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm.cs" />
     <Compile Include="Catalog.cs" />
     <Compile Include="Photo.cs" />
     <Compile Include="Program.cs" />

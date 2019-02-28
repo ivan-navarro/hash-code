@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace HashCode_Pizza
 {
@@ -11,12 +12,16 @@ namespace HashCode_Pizza
     {
         const string OutputFolder = @"..\..\..\Output\";
 
+        private const string HORIZONTAL = "H";
+        private const string VERTICAL = "V";
 
         static void Main(string[] args)
         {
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.in";
-            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.txt";
-            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_small - Copy.in";
+            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.in";
+            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_lovely_landscapes.txt";
+            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\c_memorable_moments.txt";
+            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\d_pet_pictures.txt";
+            //     var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\e_shiny_selfies.txt"
 
             var catalog = loadData(inputFile);
 
@@ -25,7 +30,7 @@ namespace HashCode_Pizza
                 Console.WriteLine($"photo {photo}");
             }
 
-            var slide = CreateSlides(catalog);
+            var slides = CreateSlides(catalog);
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
@@ -40,9 +45,31 @@ namespace HashCode_Pizza
             Console.ReadLine();
         }
 
-        private static Slide CreateSlides(Catalog catalog)
+        private static List<Slide> CreateSlides(Catalog catalog)
         {
-            return new Slide(); 
+            var slides = new List<Slide>();
+            Photo verticalPhoto = null;
+
+            foreach (var photo in catalog.Photos)
+            {
+                if (photo.Orientation == HORIZONTAL)
+                {
+                    slides.Add(new HorizontalSlide(photo));
+                }
+                else
+                {
+                    if (verticalPhoto == null)
+                    {
+                        verticalPhoto = photo;
+                    }
+                    else
+                    {
+                        slides.Add(new VerticalSlide(photo, verticalPhoto));
+                    }
+                }
+            }
+
+            return slides; 
         }
 
         private static Catalog loadData(string fileName)
