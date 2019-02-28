@@ -17,11 +17,11 @@ namespace HashCode_Pizza
 
         static void Main(string[] args)
         {
-            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.in";
+            var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\a_example.txt";
             //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\b_lovely_landscapes.txt";
             //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\c_memorable_moments.txt";
             //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\d_pet_pictures.txt";
-            //     var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\e_shiny_selfies.txt"
+            //var inputFile = args.Length > 0 ? args[0] : @"..\..\..\Input\e_shiny_selfies.txt";
 
             var catalog = loadData(inputFile);
 
@@ -33,12 +33,15 @@ namespace HashCode_Pizza
             var slides = CreateSlides(catalog);
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
+
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
             {
-                foreach (var photo in catalog.Photos)
+                sw.WriteLine(slides.Count);
+                Console.WriteLine(slides.Count);
+                foreach (var slide in slides)
                 {
-                    sw.WriteLine($"photo {photo}");
-                    Console.WriteLine($"photo {photo}");
+                    Console.WriteLine(string.Join(" ", slide.Photos.Select(p => p.Id)));
+                    sw.WriteLine(string.Join(" ", slide.Photos.Select(p => p.Id)));
                 }
             }
 
@@ -104,33 +107,5 @@ namespace HashCode_Pizza
         }
     }
 
-    internal class Slide
-    {
-        public List<Photo> Photos { get; set; }
-
-        public HashSet<string> Tags { get; set; }
-
-        public void LoadPhoto(Photo photo)
-        {
-            this.Photos.Add(photo);
-            this.Tags.UnionWith(photo.Tags);
-        }
-    }
-
-    internal class HorizontalSlide : Slide
-    {
-        public HorizontalSlide(Photo photo)
-        {
-            this.LoadPhoto(photo);
-        }
-    }
-
-    internal class VerticalSlide : Slide
-    {
-        public VerticalSlide(Photo photo1, Photo photo2)
-        {
-            this.LoadPhoto(photo1);
-            this.LoadPhoto(photo2);
-        }
-    }
+   
 }
