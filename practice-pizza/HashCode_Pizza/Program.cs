@@ -25,6 +25,7 @@ namespace HashCode_Pizza
                 Console.WriteLine($"photo {photo}");
             }
 
+            var slide = CreateSlides(catalog);
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
@@ -37,6 +38,11 @@ namespace HashCode_Pizza
             }
 
             Console.ReadLine();
+        }
+
+        private static Slide CreateSlides(Catalog catalog)
+        {
+            return new Slide(); 
         }
 
         private static Catalog loadData(string fileName)
@@ -68,6 +74,36 @@ namespace HashCode_Pizza
             }
 
             return catalog;
+        }
+    }
+
+    internal class Slide
+    {
+        public List<Photo> Photos { get; set; }
+
+        public HashSet<string> Tags { get; set; }
+
+        public void LoadPhoto(Photo photo)
+        {
+            this.Photos.Add(photo);
+            this.Tags.UnionWith(photo.Tags);
+        }
+    }
+
+    internal class HorizontalSlide : Slide
+    {
+        public HorizontalSlide(Photo photo)
+        {
+            this.LoadPhoto(photo);
+        }
+    }
+
+    internal class VerticalSlide : Slide
+    {
+        public VerticalSlide(Photo photo1, Photo photo2)
+        {
+            this.LoadPhoto(photo1);
+            this.LoadPhoto(photo2);
         }
     }
 }
