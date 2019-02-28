@@ -31,7 +31,7 @@ namespace HashCode_Pizza
         {
             var photos = loadData(inputFile);
 
-            //foreach (var photo in catalog.Photos)
+            //foreach (var photo in catalog.Photos) //
             //{
             //    Console.WriteLine($"photo {photo}");
             //}
