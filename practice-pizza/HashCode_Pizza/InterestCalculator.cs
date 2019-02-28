@@ -8,7 +8,7 @@ namespace HashCode_Pizza
 {
     public static class InterestCalculator
     {
-        public static int CalculateFactorOfInterest(IList<string> tags1, IList<string> tags2)
+        public static int CalculateFactorOfInterest(HashSet<string> tags1, HashSet<string> tags2)
         {
             var commonTags = CalculateCommonTags(tags1, tags2);
 

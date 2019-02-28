@@ -5,6 +5,7 @@ using System.Linq;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace HashCode_Pizza
 {
@@ -18,11 +19,11 @@ namespace HashCode_Pizza
 
         static void Main(string[] args)
         {
-            ProcessFile(@"..\..\..\Input\a_example.txt");
-            ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt");
-            ProcessFile(@"..\..\..\Input\c_memorable_moments.txt");
-            ProcessFile(@"..\..\..\Input\d_pet_pictures.txt");
-            ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt");
+            Task.Run(() => ProcessFile(@"..\..\..\Input\a_example.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\c_memorable_moments.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\d_pet_pictures.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt"));
 
             Console.ReadLine();
         }
@@ -37,23 +38,35 @@ namespace HashCode_Pizza
             //}
         
             var bestSlideShow = CreateSlideShow(photos);
-            var slides = bestSlideShow.Slides.ToList();
-            var newSlides = new List<Slide>();
-            Random r = new Random();
-            for (int i = 0; i < 100; i++)
-            {
-                var pos = r.Next(slides.Count - 1);
-                var temp = newSlides.ElementAt(pos);
-                newSlides.RemoveAt(pos);
-                newSlides.Insert(0, temp);
+            var maxValue = bestSlideShow.Value();
 
-               // SlideShow.
+            var newSlides = bestSlideShow.Slides.ToList();
+            for (int i = 0; i < 50; i++)
+            {
+                Random r = new Random(i);
+                var source = r.Next(newSlides.Count - 1);
+                var dest = r.Next(newSlides.Count - 1);
+                var temp = newSlides.ElementAt(source);
+                newSlides.RemoveAt(source);
+                newSlides.Insert(dest, temp);
+
+                var current = new SlideShow(newSlides);
+                var value = current.Value();
+
+                if (value > maxValue)
+                {
+                    Console.WriteLine($"Better slide found {value} > {maxValue}");
+
+                    bestSlideShow = current;
+                    maxValue = value;
+                }
             }
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
 
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
             {
+                var slides = bestSlideShow.Slides;
                 sw.WriteLine(slides.Count);
                 foreach (var slide in slides)
                 {
@@ -62,6 +75,7 @@ namespace HashCode_Pizza
             }
 
             Console.WriteLine("file processed " + inputFile);
+            Console.WriteLine("score for "+inputFile+ " is "+ bestSlideShow.Value());
         }
 
         private static SlideShow CreateSlideShow(List<Photo> photos)
