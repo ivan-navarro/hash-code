@@ -2,8 +2,16 @@
 
 namespace HashCode_Pizza
 {
-    internal class Catalog
+    internal class SlideShow
     {
-        public List<Photo> Photos { get; set; } = new List<Photo>();
+        public SlideShow(List<Slide> slides)
+        {
+            this.Slides = slides;
+        }
+
+        public List<Slide> Slides { get; }
+
+        // todo: calculate value from slides
+        private int Value { get; }
     }
 }

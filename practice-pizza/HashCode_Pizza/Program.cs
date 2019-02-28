@@ -29,14 +29,15 @@ namespace HashCode_Pizza
 
         private static void ProcessFile(string inputFile)
         {
-            var catalog = loadData(inputFile);
+            var photos = loadData(inputFile);
 
             //foreach (var photo in catalog.Photos)
             //{
             //    Console.WriteLine($"photo {photo}");
             //}
 
-            var slides = CreateSlides(catalog);
+            var slideshow = CreateSlideShow(photos);
+            var slides = slideshow.Slides;
 
             var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
 
@@ -48,14 +49,16 @@ namespace HashCode_Pizza
                     sw.WriteLine(string.Join(" ", slide.Photos.Select(p => p.Id)));
                 }
             }
+
+            Console.WriteLine("file processed " + inputFile);
         }
 
-        private static List<Slide> CreateSlides(Catalog catalog)
+        private static SlideShow CreateSlideShow(List<Photo> photos)
         {
             var slides = new List<Slide>();
             Photo verticalPhoto = null;
 
-            foreach (var photo in catalog.Photos)
+            foreach (var photo in photos)
             {
                 if (photo.Orientation == HORIZONTAL)
                 {
@@ -75,13 +78,13 @@ namespace HashCode_Pizza
                 }
             }
 
-            return slides; 
+            return new SlideShow(slides); 
         }
 
-        private static Catalog loadData(string fileName)
+        private static List<Photo> loadData(string fileName)
         { 
-            var catalog = new Catalog();
             int photoId = 0;
+            var photos = new List<Photo>();
 
             // Load data
             using (System.IO.StreamReader sr = new System.IO.StreamReader(fileName))
@@ -102,11 +105,11 @@ namespace HashCode_Pizza
                     }
 
                     var photo = new Photo(photoId++, tags, orientation);
-                    catalog.Photos.Add(photo);
+                    photos.Add(photo);
                 }
             }
 
-            return catalog;
+            return photos;
         }
     }
 
