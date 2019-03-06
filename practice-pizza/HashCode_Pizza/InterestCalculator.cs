@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HashCode_Pizza
 {
@@ -12,9 +10,9 @@ namespace HashCode_Pizza
         {
             var commonTags = CalculateCommonTags(tags1, tags2);
 
-            var tagsUniqueFrom1 = CalculateUniqueTags(tags1, tags2);
+            var tagsUniqueFrom1 = tags1.Count - commonTags;
 
-            var tagsUniqueFrom2 = CalculateCommonTags(tags2, tags1);
+            var tagsUniqueFrom2 = tags2.Count - commonTags;
 
             return Math.Min(Math.Min(commonTags, tagsUniqueFrom1), tagsUniqueFrom2);
         }
