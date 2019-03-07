@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HashCode_Pizza
 {
-     //let's code!
+    //let's code!
     class Program
     {
         const string OutputFolder = @"..\..\..\Output\";
@@ -19,46 +19,74 @@ namespace HashCode_Pizza
 
         static void Main(string[] args)
         {
-            Task.Run(() => ProcessFile(@"..\..\..\Input\a_example.txt"));
-            Task.Run(() => ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt"));
-            Task.Run(() => ProcessFile(@"..\..\..\Input\c_memorable_moments.txt"));
-            Task.Run(() => ProcessFile(@"..\..\..\Input\d_pet_pictures.txt"));
-            Task.Run(() => ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt"));
+            var t1 = Task.Run(() => ProcessFile(@"..\..\..\Input\a_example.txt"));
+            var t2 = Task.Run(() => ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt"));
+            var t3 = Task.Run(() => ProcessFile(@"..\..\..\Input\c_memorable_moments.txt"));
+            var t4 = Task.Run(() => ProcessFile(@"..\..\..\Input\d_pet_pictures.txt"));
+            var t5 = Task.Run(() => ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt"));
 
+            //Task.WhenAll(t1, t2, t3, t4, t5).Wait();
             Console.ReadLine();
         }
 
         private static void ProcessFile(string inputFile)
         {
+            try
+            {
+
+            
             var photos = loadData(inputFile);
 
             //foreach (var photo in catalog.Photos) //
             //{
             //    Console.WriteLine($"photo {photo}");
             //}
-        
+
             var bestSlideShow = CreateSlideShow(photos);
             var maxValue = bestSlideShow.Value();
 
-            var newSlides = bestSlideShow.Slides.ToList();
-            for (int i = 0; i < 50; i++)
+
+            for (int i = 0; i < 10; i++)
             {
-                Random r = new Random(i);
-                var source = r.Next(newSlides.Count - 1);
-                var dest = r.Next(newSlides.Count - 1);
-                var temp = newSlides.ElementAt(source);
-                newSlides.RemoveAt(source);
-                newSlides.Insert(dest, temp);
+                var slides = bestSlideShow.Slides.ToList();
 
-                var current = new SlideShow(newSlides);
-                var value = current.Value();
+                var worstInterest = int.MaxValue;
+                // var latestValue = worstInterest;
+                int worstPosition = 0;
 
-                if (value > maxValue)
+                for (int j = 1; j < slides.Count - 2; j++)
                 {
-                    Console.WriteLine($"Better slide found {value} > {maxValue}");
+                    var currentInterest = InterestCalculator.SlideInterest(slides[j - 1], slides[j])
+                                          + InterestCalculator.SlideInterest(slides[j], slides[j + 1]);
 
-                    bestSlideShow = current;
-                    maxValue = value;
+                    if (currentInterest < worstInterest)
+                    {
+                        Console.WriteLine($"{inputFile}: Worse interest found {currentInterest} < {worstInterest}");
+
+                        worstInterest = currentInterest;
+                        worstPosition = j;
+                    }
+                }
+
+                var movedSlide = slides.ElementAt(worstPosition);
+
+                var temp = bestSlideShow.Slides.ToList();
+                temp.RemoveAt(worstPosition);
+
+                for (int j = 0; j < slides.Count - 1; j++)
+                {
+                    var current = new SlideShow(temp);
+                    current.Slides.Insert(j, movedSlide);
+
+                    var value = current.Value();
+
+                    if (value > maxValue)
+                    {
+                        Console.WriteLine($"{inputFile}: Better slide found {value} > {maxValue}");
+
+                        bestSlideShow = current;
+                        maxValue = value;
+                    }
                 }
             }
 
@@ -75,7 +103,12 @@ namespace HashCode_Pizza
             }
 
             Console.WriteLine("file processed " + inputFile);
-            Console.WriteLine("score for "+inputFile+ " is "+ bestSlideShow.Value());
+            Console.WriteLine("score for " + inputFile + " is " + bestSlideShow.Value());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message + ex.StackTrace);
+            }
         }
 
         private static SlideShow CreateSlideShow(List<Photo> photos)
@@ -103,11 +136,11 @@ namespace HashCode_Pizza
                 }
             }
 
-            return new SlideShow(slides); 
+            return new SlideShow(slides);
         }
 
         private static List<Photo> loadData(string fileName)
-        { 
+        {
             int photoId = 0;
             var photos = new List<Photo>();
 
@@ -117,7 +150,7 @@ namespace HashCode_Pizza
                 int numImages = int.Parse(sr.ReadLine());
                 for (int i = 0; i < numImages; i++)
                 {
-                   var line = sr.ReadLine();
+                    var line = sr.ReadLine();
                     string[] parts = line.Split(' ');
 
                     string orientation = parts[0];
@@ -138,5 +171,5 @@ namespace HashCode_Pizza
         }
     }
 
-   
+
 }

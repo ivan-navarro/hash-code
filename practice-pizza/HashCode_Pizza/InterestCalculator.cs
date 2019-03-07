@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace HashCode_Pizza
 {
-    public static class InterestCalculator
+    internal static class InterestCalculator
     {
+        public static int SlideInterest(Slide slide1, Slide slide2)
+        {
+            return CalculateFactorOfInterest(slide1.Tags, slide2.Tags);
+        }
+
         public static int CalculateFactorOfInterest(HashSet<string> tags1, HashSet<string> tags2)
         {
             var commonTags = CalculateCommonTags(tags1, tags2);
