@@ -5,20 +5,21 @@ namespace HashCode_Pizza
 {
     internal class Slide
     {
-        public List<Photo> Photos { get; set; } = new List<Photo>();
+        public List<int> Photos { get; set; } = new List<int>();
 
         public HashSet<string> Tags { get; set; } = new HashSet<string>();
 
+        public int Value { get; set; }
 
         public void LoadPhoto(Photo photo)
         {
-            this.Photos.Add(photo);
+            this.Photos.Add(photo.Id);
             this.Tags.UnionWith(photo.Tags);
         }
 
         public override string ToString()
         {
-            return string.Join(" ", this.Photos.Select(p => p.Id));
+            return string.Join(" ", this.Photos);
         }
     }
 

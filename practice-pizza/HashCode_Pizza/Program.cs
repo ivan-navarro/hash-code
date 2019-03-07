@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace HashCode_Pizza
@@ -19,13 +16,14 @@ namespace HashCode_Pizza
 
         static void Main(string[] args)
         {
-            var t1 = Task.Run(() => ProcessFile(@"..\..\..\Input\a_example.txt"));
-            var t2 = Task.Run(() => ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt"));
-            var t3 = Task.Run(() => ProcessFile(@"..\..\..\Input\c_memorable_moments.txt"));
-            var t4 = Task.Run(() => ProcessFile(@"..\..\..\Input\d_pet_pictures.txt"));
-            var t5 = Task.Run(() => ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\a_example.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\b_lovely_landscapes.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\c_memorable_moments.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\d_pet_pictures.txt"));
+            Task.Run(() => ProcessFile(@"..\..\..\Input\e_shiny_selfies.txt"));
 
-            //Task.WhenAll(t1, t2, t3, t4, t5).Wait();
+            //ProcessFile(@"..\..\..\Input\d_pet_pictures.txt");
+
             Console.ReadLine();
         }
 
@@ -37,13 +35,10 @@ namespace HashCode_Pizza
             
             var photos = loadData(inputFile);
 
-            //foreach (var photo in catalog.Photos) //
-            //{
-            //    Console.WriteLine($"photo {photo}");
-            //}
+            //DrawPhotos(photos);
 
             var bestSlideShow = CreateSlideShow(photos);
-            var maxValue = bestSlideShow.Value();
+            photos.Clear();
 
 
             for (int i = 0; i < 10; i++)
@@ -94,49 +89,65 @@ namespace HashCode_Pizza
 
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
             {
-                var slides = bestSlideShow.Slides;
+                var slides = bestSlideShow.Slides.ToList();
                 sw.WriteLine(slides.Count);
+                //Console.WriteLine(slides.Count);
                 foreach (var slide in slides)
                 {
-                    sw.WriteLine(string.Join(" ", slide.Photos.Select(p => p.Id)));
+                    sw.WriteLine(slide);
+                    //Console.WriteLine(slide);
                 }
             }
 
             Console.WriteLine("file processed " + inputFile);
-            Console.WriteLine("score for " + inputFile + " is " + bestSlideShow.Value());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message + ex.StackTrace);
+            }
+            Console.WriteLine("score for "+inputFile+ " is "+ bestSlideShow.Value() + " vs " + value);
+        }
+
+        private static void DrawPhotos(List<Photo> photos)
+        {
+            foreach (var photo in photos)
+            {
+                Console.WriteLine($"photo {photo}");
             }
         }
 
         private static SlideShow CreateSlideShow(List<Photo> photos)
         {
             var slides = new List<Slide>();
-            Photo verticalPhoto = null;
 
-            foreach (var photo in photos)
+            var verticalPhotos = photos.Where(p => p.Orientation == VERTICAL).OrderByDescending(p => p.Tags.Count).ToList();
+
+            while (verticalPhotos.Count > 1)
             {
-                if (photo.Orientation == HORIZONTAL)
+                Photo bestComplementary = null;
+                var current = verticalPhotos[0];
+                int minCommonTags = int.MaxValue;
+
+                for (int i = 1; i < Math.Min(verticalPhotos.Count, 30); i++)
                 {
-                    slides.Add(new HorizontalSlide(photo));
-                }
-                else
-                {
-                    if (verticalPhoto == null)
+                    var common = verticalPhotos[i].Tags.Intersect(current.Tags).Count();
+                    if (common < minCommonTags)
                     {
-                        verticalPhoto = photo;
-                    }
-                    else
-                    {
-                        slides.Add(new VerticalSlide(photo, verticalPhoto));
-                        verticalPhoto = null;
+                        minCommonTags = common;
+                        bestComplementary = verticalPhotos[i];
                     }
                 }
+
+                slides.Add(new VerticalSlide(current, bestComplementary));
+
+                verticalPhotos.Remove(current);
+                verticalPhotos.Remove(bestComplementary);
             }
 
-            return new SlideShow(slides);
+            var horizontalSlides = photos.Where(p => p.Orientation == HORIZONTAL).Select(hp => new HorizontalSlide(hp));
+            slides.AddRange(horizontalSlides);
+
+            return new SlideShow(slides); 
         }
 
         private static List<Photo> loadData(string fileName)
