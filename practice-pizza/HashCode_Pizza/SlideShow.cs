@@ -6,16 +6,159 @@ namespace HashCode_Pizza
 {
     internal class SlideShow
     {
+        private const string HORIZONTAL = "H";
+        private const string VERTICAL = "V";
+
         public SlideShow(List<Slide> slides)
         {
-            var sortedSlides = slides.OrderByDescending(s => s.Tags.Count).ToList();
-            this.Arrange(sortedSlides);
+            this.Slides = slides;
         }
 
-        private void Arrange(List<Slide> slides)
+        public SlideShow()
         {
-            var current = slides[0];
-            MoveSlide(slides, current);
+        }
+
+        public void ArrangeByTags(List<Photo> photos, int initialPhoto = 0)
+        {
+            var slides = OrganizeVerticalSlidesByTags(photos);
+
+            var horizontalSlides = photos.Where(p => p.Orientation == HORIZONTAL).Select(hp => new HorizontalSlide(hp));
+            slides.AddRange(horizontalSlides);
+
+            var sortedSlides = slides.OrderByDescending(s => s.Tags.Count).ToList();
+
+            this.ArrangeByInterest(sortedSlides, initialPhoto);
+
+            this.CalculateValues();
+        }
+
+        //public void ArrangeCombiningVerticals(List<Photo> photos)
+        //{
+        //    this.ArrangeByInterest(photos);
+
+        //    this.CalculateValues();
+        //}
+
+        private static List<Slide> OrganizeVerticalSlidesByTags(List<Photo> photos)
+        {
+            var slides = new List<Slide>();
+
+            var verticalPhotos = photos.Where(p => p.Orientation == VERTICAL).OrderByDescending(p => p.Tags.Count)
+                .ToList();
+
+            while (verticalPhotos.Count > 1)
+            {
+                Photo bestComplementary = null;
+                var current = verticalPhotos[0];
+                int minCommonTags = int.MaxValue;
+
+                for (int i = 1; i < Math.Min(verticalPhotos.Count, 30); i++)
+                {
+                    var common = verticalPhotos[i].Tags.Intersect(current.Tags).Count();
+                    if (common < minCommonTags)
+                    {
+                        minCommonTags = common;
+                        bestComplementary = verticalPhotos[i];
+                    }
+                }
+
+                slides.Add(new VerticalSlide(current, bestComplementary));
+
+                verticalPhotos.Remove(current);
+                verticalPhotos.Remove(bestComplementary);
+            }
+
+            return slides;
+        }
+
+        public void ArrangeByInterest(List<Photo> photos, int initialPhoto = 0)
+        {
+            //var remainingPhotos = new List<Photo>(photos);
+            var sortedPhotos = photos.OrderByDescending(p => p.Tags.Count);
+
+            var remainingVertical = sortedPhotos.Where(p => p.Orientation == VERTICAL).ToList();
+            var remainingHorizontal = sortedPhotos.Where(p => p.Orientation == HORIZONTAL).ToList();
+            var previousTags = new HashSet<string>();
+
+            if (remainingHorizontal.Any())
+            {
+                var current = remainingHorizontal[0];
+                remainingHorizontal.Remove(current);
+                var firstSlide = new HorizontalSlide(current);
+                this.Slides.Add(firstSlide);
+                previousTags = firstSlide.Tags;
+            }
+
+            int remainingCount = remainingHorizontal.Count() + remainingVertical.Count() / 2;
+
+            while (remainingCount-- > 0)
+            {
+                var maxInterest = -1;
+                Slide bestSlide = null;
+                int bestHorizontal = -1;
+                int bestVertical1 = -1;
+                int bestVertical2 = -1;
+
+                for (int i = 0; i < Math.Min(100, remainingHorizontal.Count); i++)
+                {
+                    var interest =
+                        InterestCalculator.CalculateFactorOfInterest(previousTags, remainingHorizontal[i].Tags);
+                    if (interest > maxInterest)
+                    {
+                        maxInterest = interest;
+                        bestHorizontal = i;
+
+                        //Console.WriteLine($"better horizontal match for slide {remainingCount} is photo {i} with interest {interest}");
+                    }
+                }
+
+                for (int i = 0; i < Math.Min(20, remainingVertical.Count); i++)
+                {
+                    for (int j = 1; j < Math.Min(50, remainingVertical.Count); i++)
+                    {
+                        if (i > j) break;
+
+                        var interest = InterestCalculator.CalculateFactorOfInterest(previousTags,
+                            remainingVertical[i].Tags.Union(remainingVertical[j].Tags));
+                        if (interest > maxInterest)
+                        {
+                            maxInterest = interest;
+                            bestVertical1 = i;
+                            bestVertical2 = j;
+
+                            bestHorizontal = -1;
+
+                            //Console.WriteLine($"better vertical match for slide {remainingCount} is photos {i}+{j} with interest {interest}");
+                        }
+                    }
+                }
+
+                if (bestHorizontal >= 0)
+                {
+                    var photo = remainingHorizontal[bestHorizontal];
+                    bestSlide = new HorizontalSlide(photo);
+                    remainingHorizontal.Remove(photo);
+                }
+                else
+                {
+                    var photo1 = remainingVertical[bestVertical1];
+                    var photo2 = remainingVertical[bestVertical2];
+                    bestSlide = new VerticalSlide(photo1, photo2);
+                    remainingVertical.Remove(photo1);
+                    remainingVertical.Remove(photo2);
+                }
+
+                this.Slides.Add(bestSlide);
+                previousTags = bestSlide.Tags;
+            }
+
+            this.CalculateValues();
+        }
+
+        private void ArrangeByInterest(List<Slide> slides, int initialPhoto)
+        {
+            var current = slides[initialPhoto];
+            AssignSlide(slides, current);
             int counter = 0;
 
             while (slides.Count > 0)
@@ -36,23 +179,32 @@ namespace HashCode_Pizza
                     }
                 }
 
-                MoveSlide(slides, bestSlide);
+                AssignSlide(slides, bestSlide);
                 current = bestSlide;
                 counter++;
             }
         }
 
-        private void MoveSlide(List<Slide> slides, Slide slide)
+        private void AssignSlide(List<Slide> slides, Slide slide)
         {
             this.Slides.Add(slide);
             slides.Remove(slide);
         }
 
+        //private void AssignPhoto(List<Photo> photos, Slide slide)
+        //{
+        //    this.Slides.Add(slide);
+        //    slides.Remove(slide);
+        //}
+
+
         public List<Slide> Slides { get; } = new List<Slide>();
+
+        public int Score { get; private set; }
 
         public int CalculateValues()
         {
-            int totalValue = 0;
+            this.Score = 0;
 
             var previous = this.Slides[0];
             var previousInterest = 0;
@@ -63,30 +215,31 @@ namespace HashCode_Pizza
                 var nextInterest = InterestCalculator.CalculateFactorOfInterest(current.Tags, previous.Tags);
                 current.Value = previousInterest + nextInterest;
 
-                totalValue += nextInterest;
+                this.Score += nextInterest;
                 previousInterest = nextInterest;
                 previous = current;
             }
 
-            return totalValue;
+            return this.Score;
         }
 
         // todo: calculate value from slides
         public int Value()
         {
             int i = 0;
-            Slide Prev= null;
+            Slide Prev = null;
 
             foreach (Slide Current in Slides)
             {
                 if (Prev != null)
                 {
                     i += InterestCalculator.CalculateFactorOfInterest(Current.Tags, Prev.Tags);
-                } 
+                }
+
                 Prev = Current;
             }
-            return i;
 
+            return i;
         }
     }
 }

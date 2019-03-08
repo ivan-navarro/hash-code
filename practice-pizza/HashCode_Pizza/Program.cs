@@ -11,9 +11,6 @@ namespace HashCode_Pizza
     {
         const string OutputFolder = @"..\..\..\Output\";
 
-        private const string HORIZONTAL = "H";
-        private const string VERTICAL = "V";
-
         static void Main(string[] args)
         {
             Task.Run(() => ProcessFile(@"..\..\..\Input\a_example.txt"));
@@ -31,15 +28,67 @@ namespace HashCode_Pizza
         {
             try
             {
+                var photos = loadData(inputFile);
 
-            
-            var photos = loadData(inputFile);
+                //DrawPhotos(photos);
+                var bestScore = -1;
+                SlideShow bestSlideShow = null;
+                var slideShow2 = new SlideShow();
+                slideShow2.ArrangeByInterest(photos);
 
-            //DrawPhotos(photos);
+                Parallel.For(0, Math.Min(photos.Count - 1, 5), i =>
+                {
+                    var slideShow = new SlideShow();
+                    slideShow.ArrangeByTags(photos, i);
+                    Console.WriteLine($"score for {inputFile} i={i} is {slideShow.Score}");
 
-            var bestSlideShow = CreateSlideShow(photos);
-            photos.Clear();
+                    if (slideShow.Score > bestScore)
+                    {
+                        bestSlideShow = slideShow;
+                        bestScore = bestSlideShow.Score;
+                    }
+                });
 
+               
+                Parallel.For(0, Math.Min(photos.Count - 1, 5), i =>
+                {
+                    var slideShow = new SlideShow();
+                    slideShow.ArrangeByInterest(photos, i);
+
+                    if (slideShow.Score > bestScore)
+                    {
+                        Console.WriteLine($"Improved solution {inputFile} i={i} {slideShow.Score} vs {bestScore}");
+                        bestSlideShow = slideShow;
+                        bestScore = bestSlideShow.Score;
+                    }
+                });
+
+                // todo: reallocate 0 results?
+
+                var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
+                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
+                {
+                    var slides = bestSlideShow.Slides.ToList();
+                    sw.WriteLine(slides.Count);
+                    //Console.WriteLine(slides.Count);
+                    foreach (var slide in slides)
+                    {
+                        sw.WriteLine(slide);
+                        //Console.WriteLine(slide);
+                    }
+                }
+
+                Console.WriteLine("score for " + inputFile + " is " + bestSlideShow.Score);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message + ex.StackTrace);
+            }
+        }
+
+        private static SlideShow ImproveSolution(string inputFile, SlideShow bestSlideShow)
+        {
+            var maxValue = bestSlideShow.Score;
 
             for (int i = 0; i < 10; i++)
             {
@@ -85,27 +134,7 @@ namespace HashCode_Pizza
                 }
             }
 
-            var outputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(inputFile), "out"));
-
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputFile))
-            {
-                var slides = bestSlideShow.Slides.ToList();
-                sw.WriteLine(slides.Count);
-                //Console.WriteLine(slides.Count);
-                foreach (var slide in slides)
-                {
-                    sw.WriteLine(slide);
-                    //Console.WriteLine(slide);
-                }
-            }
-
-            Console.WriteLine("file processed " + inputFile);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message + ex.StackTrace);
-            }
-            Console.WriteLine("score for "+inputFile+ " is "+ bestSlideShow.Value() + " vs " + value);
+            return bestSlideShow;
         }
 
         private static void DrawPhotos(List<Photo> photos)
@@ -115,41 +144,7 @@ namespace HashCode_Pizza
                 Console.WriteLine($"photo {photo}");
             }
         }
-
-        private static SlideShow CreateSlideShow(List<Photo> photos)
-        {
-            var slides = new List<Slide>();
-
-            var verticalPhotos = photos.Where(p => p.Orientation == VERTICAL).OrderByDescending(p => p.Tags.Count).ToList();
-
-            while (verticalPhotos.Count > 1)
-            {
-                Photo bestComplementary = null;
-                var current = verticalPhotos[0];
-                int minCommonTags = int.MaxValue;
-
-                for (int i = 1; i < Math.Min(verticalPhotos.Count, 30); i++)
-                {
-                    var common = verticalPhotos[i].Tags.Intersect(current.Tags).Count();
-                    if (common < minCommonTags)
-                    {
-                        minCommonTags = common;
-                        bestComplementary = verticalPhotos[i];
-                    }
-                }
-
-                slides.Add(new VerticalSlide(current, bestComplementary));
-
-                verticalPhotos.Remove(current);
-                verticalPhotos.Remove(bestComplementary);
-            }
-
-            var horizontalSlides = photos.Where(p => p.Orientation == HORIZONTAL).Select(hp => new HorizontalSlide(hp));
-            slides.AddRange(horizontalSlides);
-
-            return new SlideShow(slides); 
-        }
-
+      
         private static List<Photo> loadData(string fileName)
         {
             int photoId = 0;
