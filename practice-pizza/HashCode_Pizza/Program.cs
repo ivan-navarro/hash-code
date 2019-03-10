@@ -33,10 +33,9 @@ namespace HashCode_Pizza
                 //DrawPhotos(photos);
                 var bestScore = -1;
                 SlideShow bestSlideShow = null;
-                var slideShow2 = new SlideShow();
-                slideShow2.ArrangeByInterest(photos);
 
-                Parallel.For(0, Math.Min(photos.Count - 1, 5), i =>
+                var NumPermutations = 3;
+                Parallel.For(0, Math.Min(photos.Count - 1, 2), i =>
                 {
                     var slideShow = new SlideShow();
                     slideShow.ArrangeByTags(photos, i);
@@ -49,8 +48,7 @@ namespace HashCode_Pizza
                     }
                 });
 
-               
-                Parallel.For(0, Math.Min(photos.Count - 1, 5), i =>
+                Parallel.For(0, Math.Min(photos.Count - 1, NumPermutations), i =>
                 {
                     var slideShow = new SlideShow();
                     slideShow.ArrangeByInterest(photos, i);
@@ -78,7 +76,7 @@ namespace HashCode_Pizza
                     }
                 }
 
-                Console.WriteLine("score for " + inputFile + " is " + bestSlideShow.Score);
+                Console.WriteLine("Final score for " + inputFile + " is " + bestSlideShow.Score);
             }
             catch (Exception ex)
             {

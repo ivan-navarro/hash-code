@@ -112,11 +112,11 @@ namespace HashCode_Pizza
                     }
                 }
 
-                for (int i = 0; i < Math.Min(20, remainingVertical.Count); i++)
+                for (int i = 0; i < Math.Min(20, remainingVertical.Count - 1); i++)
                 {
-                    for (int j = 1; j < Math.Min(50, remainingVertical.Count); i++)
+                    for (int j = Math.Min(40, remainingVertical.Count - 1); j > 0; j--)
                     {
-                        if (i > j) break;
+                        if (i == j) continue;
 
                         var interest = InterestCalculator.CalculateFactorOfInterest(previousTags,
                             remainingVertical[i].Tags.Union(remainingVertical[j].Tags));
@@ -133,23 +133,41 @@ namespace HashCode_Pizza
                     }
                 }
 
+
+                if (maxInterest == 0)
+                {
+                    Console.WriteLine($"Slide without interest when {remainingCount}");
+                }
+
                 if (bestHorizontal >= 0)
                 {
                     var photo = remainingHorizontal[bestHorizontal];
-                    bestSlide = new HorizontalSlide(photo);
+
+                    if (maxInterest > 0)
+                    {
+                        bestSlide = new HorizontalSlide(photo);
+                        this.Slides.Add(bestSlide);
+                        previousTags = bestSlide.Tags;
+                    }
+
                     remainingHorizontal.Remove(photo);
                 }
                 else
                 {
+                   
                     var photo1 = remainingVertical[bestVertical1];
                     var photo2 = remainingVertical[bestVertical2];
-                    bestSlide = new VerticalSlide(photo1, photo2);
+
+                    if (maxInterest > 0)
+                    {
+                        bestSlide = new VerticalSlide(photo1, photo2);
+                        this.Slides.Add(bestSlide);
+                        previousTags = bestSlide.Tags;
+                    }
+
                     remainingVertical.Remove(photo1);
                     remainingVertical.Remove(photo2);
                 }
-
-                this.Slides.Add(bestSlide);
-                previousTags = bestSlide.Tags;
             }
 
             this.CalculateValues();
